@@ -1,0 +1,44 @@
+def output(n):
+    y = np.array([])
+
+    for i in n:
+        if n <= 0:
+            y[n] = 0
+        else:
+            y[n] = 1
+
+        y[n] = (1/4)*delta(n) - (0.5)*y[n-1] + (1/4)*y[n-2]
+        y = np.append(y, y[n])
+
+        return(y)
+
+
+print(delta(0))
+
+
+n = np.arange(0, 10)
+a = np.array([1, -0.6, -0.16])
+b = np.array([5, 0, 0])
+
+
+def output(n):
+    y = np.array([])
+
+    for i in n:
+        if n <= 0:
+            y[n] = 0
+        else:
+            y[n] = 1
+
+        y[n] = (1/4)*delta(n) - (0.5)*y[n-1] + (1/4)*y[n-2]
+        y = np.append(y, y[n])
+
+    return(y)
+
+
+h = filter(delta(0), output(n), n)
+
+
+plt.figure()
+plt.plot(n, delta())
+plt.show()

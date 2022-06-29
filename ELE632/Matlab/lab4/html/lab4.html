@@ -1,0 +1,295 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Lab 4. Discrete Time Fourier Transform</title><meta name="generator" content="MATLAB 9.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-06-19"><meta name="DC.source" content="lab4.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Lab 4. Discrete Time Fourier Transform</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">A. Discrete-TimeFourierTransform(DTFT)</a></li><li><a href="#2">1.</a></li><li><a href="#3">2.</a></li><li><a href="#4">3.</a></li><li><a href="#5">B. TimeConvolution</a></li><li><a href="#6">1.</a></li><li><a href="#7">2.</a></li><li><a href="#8">3.</a></li><li><a href="#9">4.</a></li><li><a href="#10">5.</a></li><li><a href="#12">C. FIR Filter Design by Frequency Sampling</a></li><li><a href="#13">1.</a></li><li><a href="#14">2.</a></li><li><a href="#15">3.</a></li><li><a href="#16">4.</a></li><li><a href="#17">5.</a></li></ul></div><h2 id="1">A. Discrete-TimeFourierTransform(DTFT)</h2><h2 id="2">1.</h2><pre class="codeinput">N_0 = 128; T = 1/128; n = (0:N_0-1);
+x = (0.8.^n).*(1.0.*(n&gt;=0 &amp; n &lt; 7));clc
+X = fft(x);
+
+f = (0:N_0-1)/(T*N_0); stem(f,abs(X),<span class="string">'k.'</span>);
+axis([0 50 0 5]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'|X(f)|'</span>);
+
+stem(f-1/(T*2),fftshift(abs(X)),<span class="string">'k.'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_01.png" alt=""> <h2 id="3">2.</h2><pre class="codeinput">stem(f-1/(T*2),fftshift(angle(X)),<span class="string">'k.'</span>);
+axis([-pi pi -1.1*pi 1.1*pi]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'\angle X(f)'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_02.png" alt=""> <h2 id="4">3.</h2><pre class="codeinput">x_2 = ifft(X);
+stem(n,x_2);
+
+
+<span class="comment">% Yes the signal is the same because we are taking the inverse fourier</span>
+<span class="comment">% transform</span>
+</pre><img vspace="5" hspace="5" src="lab4_03.png" alt=""> <h2 id="5">B. TimeConvolution</h2><h2 id="6">1.</h2><pre class="codeinput">x_1 = sin(2*pi*n/10).*(1.0.*(n&gt;=0 &amp; n &lt; 7));
+
+omega= linspace(-pi,pi,128);
+W_omega = exp(-1i).^((0:length(x_1)-1)'*omega);
+CONV = (x_1*W_omega);
+
+stem(n,CONV);
+axis([0 128 -4 4]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'|X(f)|'</span>);
+</pre><pre class="codeoutput">Warning: Using only the real component of complex data. 
+</pre><img vspace="5" hspace="5" src="lab4_04.png" alt=""> <h2 id="7">2.</h2><pre class="codeinput">h = 1.0.*(n&gt;=0 &amp; n&lt;10);
+
+W_omega2 = exp(-1i).^((0:length(h)-1)'*omega);
+CONV_2 = (h*W_omega);
+stem(n,CONV_2);
+axis([0 128 -4 12]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'|H(f)|'</span>);
+</pre><pre class="codeoutput">Warning: Using only the real component of complex data. 
+</pre><img vspace="5" hspace="5" src="lab4_05.png" alt=""> <h2 id="8">3.</h2><pre class="codeinput">CONV_3 = (CONV.*CONV_2);
+
+stem(n,CONV_3);
+axis([0 128 -12 26]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'|H(f)*X|(f)|'</span>);
+</pre><pre class="codeoutput">Warning: Using only the real component of complex data. 
+</pre><img vspace="5" hspace="5" src="lab4_06.png" alt=""> <h2 id="9">4.</h2><pre class="codeinput">n = (0:254);
+y = conv(x_1,h);
+
+stem(n,y);
+axis([0 20 -2 5]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'|H(f)*X|(f)|'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_07.png" alt=""> <h2 id="10">5.</h2><pre class="codeinput">W_omega3 = exp(-1i).^((0:length(y)-1)'*omega);
+y_dtft = (y*W_omega3);
+n = 0:127;
+
+stem(n,y_dtft);
+axis([0 128 -20 30]); xlabel(<span class="string">'f [Hz]'</span>); ylabel(<span class="string">'Y|f|'</span>);
+</pre><pre class="codeoutput">Warning: Using only the real component of complex data. 
+</pre><img vspace="5" hspace="5" src="lab4_08.png" alt=""> <p>6. Yes the results of 3 and 5 are the same. This is because in 3 we first turned the x and h from time to frequency domain and did multiplicaiton and in 5 we did convulation of the result y.</p><h2 id="12">C. FIR Filter Design by Frequency Sampling</h2><h2 id="13">1.</h2><pre class="codeinput">H_d = @(Omega) (mod(Omega,2*pi)&lt;2*pi/3)+(mod(Omega,2*pi/3)&gt;2*pi-2*pi/3);
+N = 35;
+
+
+h = CH9MP1(N,H_d);
+Omega = linspace(0,2*pi,1000); samples = linspace(0,2*pi*(1-1/N),N);
+H = CH5MP1(h,1,Omega);
+
+
+subplot(2,1,1); stem([0:N-1],h,<span class="string">'k.'</span>); xlabel(<span class="string">'n'</span>); ylabel(<span class="string">'h[n]'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_09.png" alt=""> <h2 id="14">2.</h2><pre class="codeinput">plot(samples,H_d(samples),<span class="string">'k.'</span>,Omega,H_d(Omega),<span class="string">'k:'</span>,Omega,abs(H),<span class="string">'k'</span>);
+axis([0 2*pi -0.1 1.6]); xlabel(<span class="string">'\Omega'</span>); ylabel(<span class="string">'|H(\Omega)|'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_10.png" alt=""> <h2 id="15">3.</h2><pre class="codeinput"><span class="comment">% The results are pretty similar</span>
+</pre><h2 id="16">4.</h2><pre class="codeinput">H_d = @(Omega) (mod(Omega,2*pi)&lt;2*pi/3)+(mod(Omega,2*pi/3)&gt;2*pi-2*pi/3);
+N = 71;
+
+
+h = CH9MP1(N,H_d);
+Omega = linspace(0,2*pi,1000); samples = linspace(0,2*pi*(1-1/N),N);
+H = CH5MP1(h,1,Omega);
+
+
+subplot(2,1,1); stem([0:N-1],h,<span class="string">'k.'</span>); xlabel(<span class="string">'n'</span>); ylabel(<span class="string">'h[n]'</span>);
+subplot(2,1,2);
+plot(samples,H_d(samples),<span class="string">'k.'</span>,Omega,H_d(Omega),<span class="string">'k:'</span>,Omega,abs(H),<span class="string">'k'</span>);
+axis([0 2*pi -0.1 1.6]); xlabel(<span class="string">'\Omega'</span>); ylabel(<span class="string">'|H(\Omega)|'</span>);
+</pre><img vspace="5" hspace="5" src="lab4_11.png" alt=""> <h2 id="17">5.</h2><pre class="codeinput"><span class="comment">% With the number increase the length of filter increases too</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Lab 4. Discrete Time Fourier Transform
+
+%% A. Discrete-TimeFourierTransform(DTFT)
+
+%% 1. 
+
+
+
+N_0 = 128; T = 1/128; n = (0:N_0-1);
+x = (0.8.^n).*(1.0.*(n>=0 & n < 7));clc
+X = fft(x);
+
+f = (0:N_0-1)/(T*N_0); stem(f,abs(X),'k.');
+axis([0 50 0 5]); xlabel('f [Hz]'); ylabel('|X(f)|');
+
+stem(f-1/(T*2),fftshift(abs(X)),'k.');
+
+
+
+%% 2. 
+
+
+
+stem(f-1/(T*2),fftshift(angle(X)),'k.');
+axis([-pi pi -1.1*pi 1.1*pi]); xlabel('f [Hz]'); ylabel('\angle X(f)');
+
+%% 3. 
+
+x_2 = ifft(X);
+stem(n,x_2);
+
+
+% Yes the signal is the same because we are taking the inverse fourier
+% transform 
+
+
+%% B. TimeConvolution
+
+
+%% 1.
+
+x_1 = sin(2*pi*n/10).*(1.0.*(n>=0 & n < 7));
+
+omega= linspace(-pi,pi,128);
+W_omega = exp(-1i).^((0:length(x_1)-1)'*omega);
+CONV = (x_1*W_omega);
+
+stem(n,CONV);
+axis([0 128 -4 4]); xlabel('f [Hz]'); ylabel('|X(f)|');
+
+
+
+%% 2. 
+h = 1.0.*(n>=0 & n<10);
+
+W_omega2 = exp(-1i).^((0:length(h)-1)'*omega);
+CONV_2 = (h*W_omega);
+stem(n,CONV_2);
+axis([0 128 -4 12]); xlabel('f [Hz]'); ylabel('|H(f)|');
+
+%% 3. 
+
+CONV_3 = (CONV.*CONV_2);
+
+stem(n,CONV_3);
+axis([0 128 -12 26]); xlabel('f [Hz]'); ylabel('|H(f)*X|(f)|');
+
+%% 4. 
+
+n = (0:254);
+y = conv(x_1,h);
+
+stem(n,y);
+axis([0 20 -2 5]); xlabel('f [Hz]'); ylabel('|H(f)*X|(f)|');
+
+%% 5. 
+
+
+W_omega3 = exp(-1i).^((0:length(y)-1)'*omega);
+y_dtft = (y*W_omega3);
+n = 0:127;
+
+stem(n,y_dtft);
+axis([0 128 -20 30]); xlabel('f [Hz]'); ylabel('Y|f|');
+
+
+%%
+% 6. Yes the results of 3 and 5 are the same. 
+% This is because in 3 we first turned the x and h from time to frequency
+% domain and did multiplicaiton and in 5 we did convulation of the result
+% y. 
+
+
+
+
+
+
+%% C. FIR Filter Design by Frequency Sampling
+
+%% 1. 
+
+
+H_d = @(Omega) (mod(Omega,2*pi)<2*pi/3)+(mod(Omega,2*pi/3)>2*pi-2*pi/3);
+N = 35; 
+
+
+h = CH9MP1(N,H_d);
+Omega = linspace(0,2*pi,1000); samples = linspace(0,2*pi*(1-1/N),N);
+H = CH5MP1(h,1,Omega);
+
+
+subplot(2,1,1); stem([0:N-1],h,'k.'); xlabel('n'); ylabel('h[n]');
+
+%% 2. 
+
+
+plot(samples,H_d(samples),'k.',Omega,H_d(Omega),'k:',Omega,abs(H),'k');
+axis([0 2*pi -0.1 1.6]); xlabel('\Omega'); ylabel('|H(\Omega)|');
+
+
+%% 3. 
+
+% The results are pretty similar 
+
+%% 4. 
+H_d = @(Omega) (mod(Omega,2*pi)<2*pi/3)+(mod(Omega,2*pi/3)>2*pi-2*pi/3);
+N = 71; 
+
+
+h = CH9MP1(N,H_d);
+Omega = linspace(0,2*pi,1000); samples = linspace(0,2*pi*(1-1/N),N);
+H = CH5MP1(h,1,Omega);
+
+
+subplot(2,1,1); stem([0:N-1],h,'k.'); xlabel('n'); ylabel('h[n]');
+subplot(2,1,2);
+plot(samples,H_d(samples),'k.',Omega,H_d(Omega),'k:',Omega,abs(H),'k');
+axis([0 2*pi -0.1 1.6]); xlabel('\Omega'); ylabel('|H(\Omega)|');
+
+
+%% 5. 
+
+% With the number increase the length of filter increases too
+
+
+
+##### SOURCE END #####
+--></body></html>
